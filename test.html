@@ -1,0 +1,98 @@
+<html>
+<head>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@recogito/annotorious-openseadragon/dist/annotorious.min.css"></link>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/openseadragon@3.0/build/openseadragon/openseadragon.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@recogito/annotorious-openseadragon/dist/openseadragon-annotorious.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@recogito/annotorious-selector-pack@latest/dist/annotorious-selector-pack.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@recogito/annotorious-toolbar@latest/dist/annotorious-toolbar.min.js"></script>
+<script src="js/recogito-semantic-tags.js"></script>
+<script src="js/testannos.js"></script>
+</head>
+<body>
+<h3>Annotorious Semantic Tags Plugin Custom Connector Test</h3>
+<div class="slideshow-container"><div id="my-toolbar-container"></div><div id="showingimage" style="width: 640px; height: 480px;"></div>
+<script>
+
+class WikidataLexeme {
+
+  constructor(opt_config) {
+    this.name = opt_config?.name || 'WikidataLexeme';
+    this.config = opt_config;
+  }
+
+  query(query, globalConfig) {
+    return this.queryFiltered(query, globalConfig)
+  }
+
+  queryFiltered(query, globalConfig) {
+    const lang = globalConfig.language || 'en';
+    const limit = globalConfig.limit || 20;
+
+    const sparql = `
+      SELECT DISTINCT ?l ?lf ?lemma ?senseval ?senselabel ?lfgram ?gflabel WHERE {
+        ?l rdf:type ontolex:LexicalEntry ;
+           dct:language wd:Q1860 ;
+           wikibase:lexicalForm ?lf .
+        ?lf wikibase:grammaticalFeature ?lfgram .
+        ?l ontolex:sense ?sense . ?sense wdt:P5137 ?senseval . OPTIONAL { ?senseval rdfs:label ?senselabel . }
+        ?lfgram rdfs:label ?gflabel .
+        ?lf ontolex:representation "${query}"@${lang} .
+        FILTER((LANG(?gflabel))= "${lang}")
+        FILTER((LANG(?senselabel))= "${lang}")
+      }
+      LIMIT ${limit}
+    `;
+
+    const url = wd.sparqlQuery(sparql);
+    return fetch(url)
+      .then(response => response.json())
+      .then(data => data.results.bindings.map(result => {
+        return { 
+          uri: result.lf.value,
+          label: result.lemma.value+" ("+result.gflabel.value+") ["+result.senselabel.value+"]", 
+          description: result.senselabel.value
+        };
+      }));
+  }
+
+  doFetch(url) {
+
+  }
+
+}
+
+WikidataLexeme.matches = tag =>
+  tag.uri.match(/^https?:\/\/www.wikidata.org\/entity\/L/g);
+
+WikidataLexeme.format = tag =>
+  tag.uri.substring(tag.uri.indexOf('entity/L') + 7);
+
+var viewer = OpenSeadragon({id: "showingimage",prefixUrl: "/openseadragon/images/", tileSources:{"type":"image","url":"https://heidicon.ub.uni-heidelberg.de/iiif/2/1113320:577502/full/full/0/default.jpg"}});
+    var semantictagsconfig={
+        dataSources: [  
+            'Wikidata', 
+            'VIAF',
+			{ source: new WikidataLexeme(), name: 'WikidataLexeme' }
+        ],
+        availableLanguages: [
+            'en', 'de', 'fa'
+        ],
+        limit: 10
+    }
+
+    var annoconfig={
+	widgets:[
+    recogito.SemanticTags(semantictagsconfig),
+    'COMMENT'
+    ]}
+
+    // Initialize the Annotorious plugin
+    var anno = OpenSeadragon.Annotorious(viewer,annoconfig);
+	annotations=[]
+    for(ann in annos){
+      annotations.push(annos[ann])
+    }
+	anno.setAnnotations(annotations);
+</script>
+</body>
+</html>
