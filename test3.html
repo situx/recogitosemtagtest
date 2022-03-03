@@ -1,0 +1,63 @@
+<html>
+<head>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@recogito/annotorious-openseadragon/dist/annotorious.min.css"></link>
+<script src="https://cdn.jsdelivr.net/npm/@recogito/recogito-js/dist/recogito.min.js"></script>
+<script src="js/recogito-semantic-tags.js"></script>
+</head>
+<body>
+<h3>Recogito Semantic Tags Plugin Custom Connector Test</h3>
+<pre id="my-content">My text to annotate.</pre>
+<script>
+
+class DBPediaSource {
+
+  // Configuration parameters provided 
+  // to the widget during initialization
+  constructor(widgetConfig) {
+    this.name = widgetConfig?.name || 'DBPediaSource'
+  }
+
+  // Query string + global widget configuration (language, etc.)
+  query(query, globalConfig) {
+    return fetch(`https://dbpedia.org/sparql?q=${query}`)
+      .then(response => response.json())
+      .then(data => data.results.map(result => {
+        // Extract relevant fields and return a Tag object
+        const { uri, label, description } = result;
+        return { uri, label, description };
+      }));
+  }
+
+}
+
+// Entities from my datasource all start with www.mysource.org/entity
+DBPediaSource.matches = tag =>
+  true;
+
+// Format as 'my:<ID>'
+DBPediaSource.format = tag =>
+  tag;
+
+    var semantictagsconfig={
+        dataSources: [  
+            'Wikidata', 
+            'VIAF',
+			{ source: new DBPediaSource(), name: 'DBPediaSource' }
+        ],
+        availableLanguages: [
+            'en', 'de', 'fa'
+        ],
+        limit: 10
+    }
+
+      var r = Recogito.init({
+        content: document.getElementById('my-content'),
+		widgets: [
+            'COMMENT',
+            recogito.SemanticTags(semantictagsconfig)
+        ]
+		});
+
+</script>
+</body>
+</html>
