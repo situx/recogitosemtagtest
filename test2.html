@@ -1,0 +1,73 @@
+<html>
+<head>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@recogito/annotorious-openseadragon/dist/annotorious.min.css"></link>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/openseadragon@3.0/build/openseadragon/openseadragon.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@recogito/annotorious-openseadragon/dist/openseadragon-annotorious.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@recogito/annotorious-selector-pack@latest/dist/annotorious-selector-pack.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@recogito/annotorious-toolbar@latest/dist/annotorious-toolbar.min.js"></script>
+<script src="js/recogito-semantic-tags.js"></script>
+<script src="js/testannos.js"></script>
+</head>
+<body>
+<h3>Annotorious Semantic Tags Plugin Custom Connector Test</h3>
+<div class="slideshow-container"><div id="my-toolbar-container"></div><div id="showingimage" style="width: 640px; height: 480px;"></div>
+<script>
+
+class DBPediaSource {
+
+  // Configuration parameters provided 
+  // to the widget during initialization
+  constructor(widgetConfig) {
+    this.name = widgetConfig?.name || 'DBPediaSource'
+  }
+
+  // Query string + global widget configuration (language, etc.)
+  query(query, globalConfig) {
+    return fetch(`https://dbpedia.org/sparql?q=${query}`)
+      .then(response => response.json())
+      .then(data => data.results.map(result => {
+        // Extract relevant fields and return a Tag object
+        const { uri, label, description } = result;
+        return { uri, label, description };
+      }));
+  }
+
+}
+
+// Entities from my datasource all start with www.mysource.org/entity
+DBPediaSource.matches = tag =>
+  true;
+
+// Format as 'my:<ID>'
+DBPediaSource.format = tag =>
+  tag;
+
+var viewer = OpenSeadragon({id: "showingimage",prefixUrl: "/openseadragon/images/", tileSources:{"type":"image","url":"https://heidicon.ub.uni-heidelberg.de/iiif/2/1113320:577502/full/full/0/default.jpg"}});
+    var semantictagsconfig={
+        dataSources: [  
+            'Wikidata', 
+            'VIAF',
+			{ source: new DBPediaSource(), name: 'DBPediaSource' }
+        ],
+        availableLanguages: [
+            'en', 'de', 'fa'
+        ],
+        limit: 10
+    }
+
+    var annoconfig={
+	widgets:[
+    recogito.SemanticTags(semantictagsconfig),
+    'COMMENT'
+    ]}
+
+    // Initialize the Annotorious plugin
+    var anno = OpenSeadragon.Annotorious(viewer,annoconfig);
+	annotations=[]
+    for(ann in annos){
+      annotations.push(annos[ann])
+    }
+	anno.setAnnotations(annotations);
+</script>
+</body>
+</html>
