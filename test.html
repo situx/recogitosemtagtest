@@ -81,9 +81,8 @@ var viewer = OpenSeadragon({id: "showingimage",prefixUrl: "/openseadragon/images
     }
 
     var annoconfig={
-	widgets:[
-    recogito.SemanticTags(semantictagsconfig),
-    'COMMENT'
+	widgets:[  
+    'COMMENT','TAG',recogito.SemanticTags(semantictagsconfig)
     ]}
 
     // Initialize the Annotorious plugin
