@@ -16,6 +16,7 @@
 <script>
 var curnamespace="http://www.example.org/"
 var readOnlyVar=false
+var mlVocabulary=[{"label":"Broken","uri":curnamespace+"Broken"},{"label":"Character","uri":curnamespace+"Character"},{"label":"Line","uri":curnamespace+"Line"},{"label":"Image","uri":curnamespace+"Image"},{"label":"Word","uri":curnamespace+"Word"},{"label":"Seal","uri":curnamespace+"Seal"},{"label":"Phrase","uri":curnamespace+"Phrase"},{"label":"Erased","uri":curnamespace+"Erased"},{"label":"StrikeOut","uri":curnamespace+"StrikeOut"},{"label":"Wordstart","uri":curnamespace+"Wordstart"},{"label":"Wordend","uri":curnamespace+"Wordend"},{"label":"InWord","uri":curnamespace+"InWord"},{"label":"Wedge","uri":curnamespace+"Wedge"},{"label":"UnknownIfWord","uri":curnamespace+"UnknownIfWord"}]
 var mappings={"PaleoCode":{"inputtype":"text","regex":"","handler":null,"paleocodage":true,"uri":curnamespace+"PaleoCode"},
 "TabletSide":{"inputtype":"select","regex":"","handler":null,"uri":curnamespace+"TabletSide","data":{"selected":"selected","front":"front","back":"back","left":"left","right":"right","top":"top","bottom":"bottom"}},
 "Transliteration":{"inputtype":"text","regex":"","handler":null,"uri":curnamespace+"Transliteration"},
@@ -234,8 +235,7 @@ var viewer = OpenSeadragon({id: "showingimage",prefixUrl: "/openseadragon/images
     var semantictagsconfig={
         dataSources: [  
             'Wikidata', 
-            'VIAF'//,
-			//{ source: WikidataLexeme, name: 'WikidataLexeme' }
+            'VIAF'
         ],
         availableLanguages: [
             'en', 'de', 'fa'
@@ -245,7 +245,9 @@ var viewer = OpenSeadragon({id: "showingimage",prefixUrl: "/openseadragon/images
 
     var annoconfig={
 	widgets:[  
-    TextMapWidget,'COMMENT','TAG',recogito.SemanticTags(semantictagsconfig)
+    TextMapWidget,'COMMENT',{ widget: 'TAG', 
+    vocabulary: mlVocabulary
+    },recogito.SemanticTags(semantictagsconfig)
     ]}
 
     // Initialize the Annotorious plugin
