@@ -232,7 +232,12 @@ WikidataLexeme.format = tag =>
   tag.uri.substring(tag.uri.indexOf('entity/L') + 7);
 
 var viewer = OpenSeadragon({id: "showingimage",prefixUrl: "/openseadragon/images/", tileSources:{"type":"image","url":"https://heidicon.ub.uni-heidelberg.de/iiif/2/1113320:577502/full/full/0/default.jpg"}});
-    var semantictagsconfig={
+    
+    var annoconfig={
+	widgets:[  
+    TextMapWidget,'COMMENT',{ widget: 'TAG', 
+    vocabulary: mlVocabulary
+    },recogito.SemanticTags({
         dataSources: [  
             'Wikidata', 
             'VIAF'
@@ -241,13 +246,7 @@ var viewer = OpenSeadragon({id: "showingimage",prefixUrl: "/openseadragon/images
             'en', 'de', 'fa'
         ],
         limit: 10
-    }
-
-    var annoconfig={
-	widgets:[  
-    TextMapWidget,'COMMENT',{ widget: 'TAG', 
-    vocabulary: mlVocabulary
-    },recogito.SemanticTags(semantictagsconfig)
+    })
     ]}
 
     // Initialize the Annotorious plugin
