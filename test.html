@@ -240,7 +240,8 @@ var viewer = OpenSeadragon({id: "showingimage",prefixUrl: "/openseadragon/images
     },recogito.SemanticTags({
         dataSources: [  
             'Wikidata', 
-            'VIAF'
+            'VIAF',
+	    { source: WikidataLexeme }
         ],
         availableLanguages: [
             'en', 'de', 'fa'
