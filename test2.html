@@ -47,7 +47,7 @@ var viewer = OpenSeadragon({id: "showingimage",prefixUrl: "/openseadragon/images
         dataSources: [  
             'Wikidata', 
             'VIAF',
-			{ source: DBPediaSource, name: 'DBPediaSource' }
+			{ source: new DBPediaSource(), name: 'DBPediaSource' }
         ],
         availableLanguages: [
             'en', 'de', 'fa'
