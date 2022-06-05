@@ -231,6 +231,8 @@ WikidataLexeme.matches = tag =>
 WikidataLexeme.format = tag =>
   tag.uri.substring(tag.uri.indexOf('entity/L') + 7);
 
+BUILTIN_CONNECTORS["WikidataLexeme"]=WikidataLexeme
+	
 var viewer = OpenSeadragon({id: "showingimage",prefixUrl: "/openseadragon/images/", tileSources:{"type":"image","url":"https://heidicon.ub.uni-heidelberg.de/iiif/2/1113320:577502/full/full/0/default.jpg"}});
     
     var annoconfig={
@@ -241,7 +243,7 @@ var viewer = OpenSeadragon({id: "showingimage",prefixUrl: "/openseadragon/images
         dataSources: [  
             'Wikidata', 
             'VIAF',
-	    { source: WikidataLexeme }
+	    'WikidataLexeme'
         ],
         availableLanguages: [
             'en', 'de', 'fa'
